@@ -1,0 +1,6 @@
+[submodule "data_raw/human_robot_interaction_data"]
+	path = data_raw/human_robot_interaction_data
+	url = git@github.com:souljaboy764/human_robot_interaction_data.git
+[submodule "data_raw/nuisi_dataset"]
+	path = data_raw/nuisi_dataset
+	url = git@github.com:souljaboy764/nuisi_dataset.git
