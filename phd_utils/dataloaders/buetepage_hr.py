@@ -4,6 +4,7 @@ import os
 
 from phd_utils.data import *
 
+# Dataset class for the HRI Yumi data in https://github.com/souljaboy764/human_robot_interaction_data/
 class YumiDataset(Dataset):
 	def __init__(self, train=True, downsample=1):
 		with np.load(os.path.join(os.path.dirname(__file__),'..','..','data_preproc','buetepage_hr','traj_data.npz'), allow_pickle=True) as data:
@@ -36,6 +37,7 @@ class YumiDataset(Dataset):
 	def __getitem__(self, index):
 		return self.traj_data[index].astype(np.float32), self.labels[index].astype(np.int32)
 
+# Dataset class wrapping the YumiWindowDataset class for using a temporal window of observations
 class YumiWindowDataset(Dataset):
 	def __init__(self, train=True, window_length=40, downsample=1):
 		dataset = YumiDataset(train, downsample)

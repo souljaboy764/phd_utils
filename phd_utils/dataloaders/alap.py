@@ -2,6 +2,7 @@ import numpy as np
 import os
 from torch.utils.data import Dataset
 
+# Dataset class for the Human-Human Interaction data in https://zenodo.org/record/7767535#.ZB2-43bMLIU
 class HHWindowDataset(Dataset):
 	def __init__(self, train=True, window_length=5, downsample=1):
 		with np.load(os.path.join(os.path.dirname(__file__),'..','..','data_preproc','alap','traj_data.npz'), allow_pickle=True) as data:

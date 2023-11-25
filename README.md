@@ -28,6 +28,6 @@ For the [Handovers Dataset](https://zenodo.org/records/7767535#.ZB2-43bMLIU), it
 To preprocess the data, first download the dataset and unzip the file `Bimanual Handovers Dataset.zip` to a suitable location . Assuming that the unzipped folder is at `~/Documents/Bimanual Handovers Dataset/`, to preprocess the data, run:
 
 ```bash
-python data_raw/buetepage_preproc.py --src ~/Documents --dst data_preproc/alap/ # dataset for the results reported in the paper
-python data_raw/buetepage_preproc.py --src ~/Documents --dst data_preproc/alap_kobo/ --robot # dataset for training the model to be executed on the Kobo robot
+python data_raw/alap_preproc.py --src ~/Documents --dst data_preproc/alap/ # dataset for the results reported in the paper
+python data_raw/alap_preproc.py --src ~/Documents --dst data_preproc/alap_kobo/ --robot # dataset for training the model to be executed on the Kobo robot
 ```

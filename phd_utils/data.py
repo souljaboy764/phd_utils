@@ -8,6 +8,7 @@ from phd_utils.transformations import *
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+# Downsampling a given trajectory to a new length
 def downsample_trajs(train_data, downsample_len):
 	theta = torch.Tensor(np.array([[[1,0,0.], [0,1,0]]])).to(device).repeat(train_data[0].shape[1],1,1)
 	num_trajs = len(train_data)
@@ -38,6 +39,7 @@ def angle(a,b):
 def projectToPlane(plane, vec):
 	return (vec - plane)*np.dot(plane,vec)
 
+# rotating a given human skeleton such that the x-axis faces forward, the y-axis faces leftward, and the z-axis faces upwards
 def rotation_normalization(skeleton):
 	leftShoulder = skeleton[joints_dic["left_shoulder"]]
 	rightShoulder = skeleton[joints_dic["right_shoulder"]]
@@ -56,7 +58,9 @@ def rotation_normalization(skeleton):
 					 [yAxis[0], yAxis[1], yAxis[2]],
 					 [zAxis[0], zAxis[1], zAxis[2]]])
 
-def joint_angle_extraction(skeleton): # Based on the Pepper Robot URDF, with the limits
+
+# Extracting the joint angles for Pepper's arm from a given human arm configuration, based on the Pepper Robot URDF, with the limits
+def joint_angle_extraction(skeleton): 
 	# Recreating arm with upper and under arm
 	rightUpperArm = skeleton[1] - skeleton[0]
 	rightUnderArm = skeleton[2] - skeleton[1]
@@ -82,7 +86,7 @@ def joint_angle_extraction(skeleton): # Based on the Pepper Robot URDF, with the
 
 	return np.array([rightPitch, rightYaw, rightRoll, rightElbowAngle]).astype(np.float32)
 
-
+# Creating a trajectory by concatenating a time window of trajectory observations
 def window_concat(traj_data, window_length, robot=None, input_dim=None):
 	window_trajs = []
 	for i in range(len(traj_data)):

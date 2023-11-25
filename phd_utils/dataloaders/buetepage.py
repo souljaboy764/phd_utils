@@ -4,6 +4,7 @@ import os
 
 from phd_utils.data import *
 
+# Dataset class for the Human-Human Interaction data in https://github.com/souljaboy764/human_robot_interaction_data/
 class HHDataset(Dataset):
 	def __init__(self, train=True, downsample=1):
 		with np.load(os.path.join(os.path.dirname(__file__),'..','..','data_preproc','buetepage','traj_data.npz'), allow_pickle=True) as data:
@@ -45,6 +46,8 @@ class HHDataset(Dataset):
 
 	def __getitem__(self, index):
 		return self.traj_data[index].astype(np.float32), self.labels[index].astype(np.int32)
+
+# Dataset class wrapping the HHDataset class for using a temporal window of observations
 class HHWindowDataset(Dataset):
 	def __init__(self, train=True, window_length=40, downsample = 1):
 		dataset = HHDataset(train, downsample)
@@ -61,7 +64,8 @@ class HHWindowDataset(Dataset):
 
 	def __getitem__(self, index):
 		return self.traj_data[index].astype(np.float32), self.labels[index].astype(np.int32)
-	
+
+# Dataset class wrapping the HHDataset class for extracting Pepper's joint angles from the human skeletons
 class PepperDataset(HHDataset):
 	def __init__(self, train=True, downsample=1):
 		super(PepperDataset, self).__init__(train, downsample)
@@ -79,7 +83,8 @@ class PepperDataset(HHDataset):
 			traj_r = np.array(traj_r) # seq_len, 4
 			
 			self.traj_data[i] = np.concatenate([self.traj_data[i][:, :input_slice.start], traj_r], axis=-1) # seq_len, input_dim + 4
-	
+
+# Dataset class wrapping the HHWindowDataset class and abstracting the PepperDataset class for using a temporal window of observations
 class PepperWindowDataset(HHWindowDataset):
 	def __init__(self, train=True, window_length=40, downsample = 1):
 		self._dataset = PepperDataset(train, downsample)
