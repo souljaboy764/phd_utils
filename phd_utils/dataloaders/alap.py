@@ -3,8 +3,8 @@ import os
 from torch.utils.data import Dataset
 
 class HHWindowDataset(Dataset):
-	def __init__(self, datafile, train=True, window_length=5, downsample=1):
-		with np.load(os.path.join(datafile), allow_pickle=True) as data:
+	def __init__(self, train=True, window_length=5, downsample=1):
+		with np.load(os.path.join(os.path.dirname(__file__),'..','..','data_preproc','alap','traj_data.npz'), allow_pickle=True) as data:
 			if train:
 				p1_trajs, p2_trajs, _, _ = data['train_data']
 				self.actidx = np.array([[0,105], [105, 168]])
@@ -51,14 +51,6 @@ class HHWindowDataset(Dataset):
 		self.labels = np.zeros(self.len)
 		for idx in range(len(self.actidx)):
 			self.labels[self.actidx[idx][0]:self.actidx[idx][1]] = idx
-
-		# # For buetepage_hri
-		# self.labels = []
-		# for idx in range(len(self.actidx)):
-		# 	for i in range(self.actidx[idx][0],self.actidx[idx][1]):
-		# 		label = np.zeros((self.traj_data[i].shape[0],len(self.actidx)))
-		# 		label[:, idx] = 1
-		# 		self.labels.append(label)
 
 	def __len__(self):
 		return self.len

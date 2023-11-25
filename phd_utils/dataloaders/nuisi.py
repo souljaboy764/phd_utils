@@ -1,21 +1,18 @@
-import torch
 from torch.utils.data import Dataset
 import numpy as np
+import os
 
 from phd_utils.data import *
 
 class HHDataset(Dataset):
-	def __init__(self, datafile, train=True, downsample=None): # downsample only needed for compatibility
-		device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-		with np.load(datafile, allow_pickle=True) as data:
+	def __init__(self, train=True, downsample=None): # downsample only needed for compatibility
+		with np.load(os.path.join(os.path.dirname(__file__),'..','..','data_preproc','nuisi','traj_data.npz'), allow_pickle=True) as data:
 			if train:
 				traj_data = data['train_data']
-				labels = data['train_labels']
 				self.actidx = np.array([[0, 9], [9, 17], [17, 26], [26, 33]])
 
 			else:
 				traj_data = data['test_data']
-				labels = data['test_labels']
 				self.actidx = np.array([[0, 3], [3, 6], [6, 9], [9, 11]])
 			
 			self.traj_data = []
@@ -44,8 +41,8 @@ class HHDataset(Dataset):
 		return self.traj_data[index].astype(np.float32), self.labels[index].astype(np.int32)
 
 class HHWindowDataset(Dataset):
-	def __init__(self, datafile, train=True, window_length=5, downsample=None): # downsample only needed for compatibility
-		dataset = HHDataset(datafile, train)
+	def __init__(self, train=True, window_length=5, downsample=None): # downsample only needed for compatibility
+		dataset = HHDataset(train)
 		self.actidx = dataset.actidx
 		self.traj_data = window_concat(dataset.traj_data, window_length)
 		self.len = len(self.traj_data)
@@ -71,8 +68,8 @@ class HHWindowDataset(Dataset):
 
 	
 class PepperDataset(HHDataset):
-	def __init__(self, datafile, train=True, downsample=None):
-		super().__init__(datafile, train, downsample)
+	def __init__(self, train=True, downsample=None):
+		super().__init__(train, downsample)
 		
 		for i in range(len(self.traj_data)):
 			seq_len, dims = self.traj_data[i].shape
@@ -88,8 +85,8 @@ class PepperDataset(HHDataset):
 			# self.traj_data[i] = np.concatenate([self.traj_data[i][:, dims//4-3:dims//4], self.traj_data[i][:, dims//2-3:dims//2], traj_r], axis=-1) # seq_len, dims//2 + 4
 		
 class PepperWindowDataset(HHWindowDataset):
-	def __init__(self, datafile, train=True, window_length=5, downsample = 1):
-		self._dataset = PepperDataset(datafile, train, downsample)
+	def __init__(self, train=True, window_length=5, downsample = 1):
+		self._dataset = PepperDataset(train, downsample)
 		self.actidx = self._dataset.actidx
 		self.traj_data = window_concat(self._dataset.traj_data, window_length, 'pepper')
 		self.len = len(self.traj_data)

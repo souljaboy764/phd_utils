@@ -1,12 +1,12 @@
-import torch
 from torch.utils.data import Dataset
 import numpy as np
+import os
 
 from phd_utils.data import *
 
 class YumiDataset(Dataset):
-	def __init__(self, datafile, train=True, downsample=1):
-		with np.load(datafile, allow_pickle=True) as data:
+	def __init__(self, train=True, downsample=1):
+		with np.load(os.path.join(os.path.dirname(__file__),'..','..','data_preproc','buetepage_hr','traj_data.npz'), allow_pickle=True) as data:
 			if train:
 				self.traj_data = data['train_data']
 				self.labels = data['train_labels']
@@ -24,8 +24,7 @@ class YumiDataset(Dataset):
 				
 				traj_r = self.traj_data[i][:,-7:]
 				if downsample < 1:
-					assert downsample != 0
-					self.traj_data[i] = np.concatenate(downsample_trajs([traj_h[:,None], traj_r[:,None]], int(downsample*seq_len), device),axis=-1)[:, 0, :]
+					self.traj_data[i] = np.concatenate(downsample_trajs([traj_h[:,None], traj_r[:,None]], int(downsample*seq_len)),axis=-1)[:, 0, :]
 			self.len = len(self.traj_data)
 			self.labels = np.zeros(self.len)
 			for idx in range(len(self.actidx)):
@@ -38,8 +37,8 @@ class YumiDataset(Dataset):
 		return self.traj_data[index].astype(np.float32), self.labels[index].astype(np.int32)
 
 class YumiWindowDataset(Dataset):
-	def __init__(self, datafile, train=True, window_length=40, downsample=1):
-		dataset = YumiDataset(datafile, train, downsample)
+	def __init__(self, train=True, window_length=40, downsample=1):
+		dataset = YumiDataset(train, downsample)
 		self.actidx = dataset.actidx
 		self.traj_data = window_concat(dataset.traj_data, window_length, 'yumi')
 		self.len = len(self.traj_data)
@@ -48,14 +47,6 @@ class YumiWindowDataset(Dataset):
 		self.labels = np.zeros(self.len)
 		for idx in range(len(self.actidx)):
 			self.labels[self.actidx[idx][0]:self.actidx[idx][1]] = idx
-		
-		# Buetepage HRI
-		self.labels = []
-		for idx in range(len(self.actidx)):
-			for i in range(self.actidx[idx][0],self.actidx[idx][1]):
-				label = np.zeros((self.traj_data[i].shape[0],len(self.actidx)))
-				label[:, idx] = 1
-				self.labels.append(label)
 
 	def __len__(self):
 		return self.len
