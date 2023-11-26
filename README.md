@@ -31,3 +31,5 @@ To preprocess the data, first download the dataset and unzip the file `Bimanual 
 python data_raw/alap_preproc.py --src ~/Documents --dst data_preproc/alap/ # dataset for the results reported in the paper
 python data_raw/alap_preproc.py --src ~/Documents --dst data_preproc/alap_kobo/ --robot # dataset for training the model to be executed on the Kobo robot
 ```
+
+Currently only the case of Robot-to-Human handover is explored
