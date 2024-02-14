@@ -23,8 +23,8 @@ class HHDataset(Dataset):
 				traj_2 = traj_data[i][..., dims//2:]
 
 				if downsample < 1:
-					traj = np.array(downsample_trajs([np.concatenate([traj_1[:, None], traj_2[:, None]], axis=-1)], int(downsample*seq_len)))[0, :, 0, :]
-					seq_len, dims = traj.shape
+					traj = np.array(downsample_trajs([np.concatenate([traj_1[:, None], traj_2[:, None]], axis=-1)], downsample))[0, :, 0, :]
+					_, dims = traj.shape
 					traj_1 = traj[:, :dims//2]
 					traj_2 = traj[:, dims//2:]
 

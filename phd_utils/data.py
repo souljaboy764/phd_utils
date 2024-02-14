@@ -9,16 +9,16 @@ from phd_utils.transformations import *
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Downsampling a given trajectory to a new length
-def downsample_trajs(train_data, downsample_len):
+def downsample_trajs(train_data, downsample):
 	theta = torch.Tensor(np.array([[[1,0,0.], [0,1,0]]])).to(device).repeat(train_data[0].shape[1],1,1)
 	num_trajs = len(train_data)
 	for i in range(num_trajs):
 		old_shape=train_data[i].shape
 		train_data[i] = train_data[i].transpose(1,2,0) # 4, 3, seq_len
 		train_data[i] = torch.Tensor(train_data[i]).to(device).unsqueeze(2) # 4, 3, 1 seq_len
-		train_data[i] = torch.concat([train_data[i], torch.zeros_like(train_data[i])], dim=2) # 4, 3, 2 seq_len
+		train_data[i] = torch.concat([train_data[i], torch.zeros_like(train_data[i])], dim=2) # 4, 3, 2, seq_len
 		
-		grid = affine_grid(theta, torch.Size([old_shape[1], old_shape[2], 2, int(downsample_len*old_shape[0])]), align_corners=True)
+		grid = affine_grid(theta, torch.Size([old_shape[1], old_shape[2], 2, int(downsample*old_shape[0])]), align_corners=True)
 		train_data[i] = grid_sample(train_data[i].type(torch.float32), grid, align_corners=True) # 4, 3, 2 downsample_len
 		train_data[i] = train_data[i][:, :, 0].cpu().detach().numpy() # 4, 3, downsample_len
 		train_data[i] = train_data[i].transpose(2,0,1) # downsample_len, 4, 3
@@ -115,7 +115,8 @@ def window_concat(traj_data, window_length, robot=None, input_dim=None):
 		# 	trajs_concat.append(traj_data[i][:,:dim-7][idx].reshape((traj_shape[0] + 1 - 2*window_length, window_length*(dim-7))))
 		# 	idx = np.array([np.arange(i,i+window_length) for i in range(window_length, traj_shape[0] + 1 - window_length)])
 		# 	trajs_concat.append(traj_data[i][:,-7:][idx].reshape((traj_shape[0] + 1 - 2*window_length, window_length*7)))
-
 		trajs_concat = np.concatenate(trajs_concat,axis=-1)
 		window_trajs.append(trajs_concat)
+		# print(traj_shape)
+		# print(trajs_concat.shape)
 	return window_trajs

@@ -25,7 +25,7 @@ class YumiDataset(Dataset):
 				
 				traj_r = self.traj_data[i][:,-7:]
 				if downsample < 1:
-					self.traj_data[i] = np.concatenate(downsample_trajs([traj_h[:,None], traj_r[:,None]], int(downsample*seq_len)),axis=-1)[:, 0, :]
+					self.traj_data[i] = np.concatenate(downsample_trajs([traj_h[:,None], traj_r[:,None]], downsample),axis=-1)[:, 0, :]
 			self.len = len(self.traj_data)
 			self.labels = np.zeros(self.len)
 			for idx in range(len(self.actidx)):
