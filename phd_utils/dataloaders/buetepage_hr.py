@@ -18,11 +18,9 @@ class YumiDataset(Dataset):
 				self.actidx = np.array([[0,2],[2,4],[4,6],[6,9]]) # Human-robot trajs
 			
 			for i in range(len(self.traj_data)):
-				seq_len, dims = self.traj_data[i].shape
-				traj_h = self.traj_data[i][:,3:-7]
+				traj_h = self.traj_data[i][:,:-7]
 				vel_h = np.diff(traj_h, axis=0, prepend=traj_h[0:1,:])
 				traj_h = np.concatenate([traj_h, vel_h],axis=-1)
-				
 				traj_r = self.traj_data[i][:,-7:]
 				if downsample < 1:
 					self.traj_data[i] = np.concatenate(downsample_trajs([traj_h[:,None], traj_r[:,None]], downsample),axis=-1)[:, 0, :]
