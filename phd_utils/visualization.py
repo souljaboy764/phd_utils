@@ -16,7 +16,7 @@ def mypause(interval):
 
 def prepare_axis():
 	fig = plt.figure()
-	ax = fig.add_subplot(1,2,1, projection='3d')
+	ax = fig.add_subplot(1,1,1, projection='3d')
 	# plt.ion()
 	ax.view_init(25, -155)
 	ax.set_xlim3d([-0.05, 0.75])
@@ -44,6 +44,6 @@ def reset_axis(ax, variant = None, action = None, frame_idx = None):
 def visualize_skeleton(ax, trajectory, **kwargs):
 	# trajectory shape: W, J, D (window size x num joints x joint dims)
 	for w in range(trajectory.shape[0]):
-		ax.plot(trajectory[w, :, 0], trajectory[w, :, 1], trajectory[w, :, 2], color='k', marker='o', **kwargs)
+		ax.scatter(trajectory[w, :, 0], trajectory[w, :, 1], trajectory[w, :, 2], color='k', marker='o', **kwargs)
 	
 	return ax
